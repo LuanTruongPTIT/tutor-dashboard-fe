@@ -65,6 +65,11 @@
     --ring: 0 0% 83.1%;
   }
 }
+ .glassmorphism {
+   background: hsla(0, 0%, 100%, 0.25);
+   backdrop-filter: blur(4px);
+   -webkit-backdrop-filter: blur(4px);
+ }
 
 @layer base {
   * {
@@ -72,5 +77,9 @@
   }
   body {
     @apply bg-background text-foreground;
+      /* height: 100vh; */
   }
+}
+.ql-container {
+  font-size: 16px!important;
 }

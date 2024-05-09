@@ -1,0 +1,8 @@
+[
+  {
+    "id": "1",
+    "code": 12345,
+    "fullName": "John Doe",
+    "courses": ["Course A", "Course B", "Course C"]
+  }
+]
