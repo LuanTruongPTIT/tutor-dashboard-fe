@@ -1,4 +1,6 @@
 import { CoursesList } from "@/app/_component/courses-list";
+import Loading from "@/app/loading";
+import { Suspense } from "react";
 
 export default function Courses() {
   return (
@@ -16,7 +18,9 @@ export default function Courses() {
          variant="success"
        />
      </div> */}
-      <CoursesList />
+      <Suspense fallback={<Loading />}>
+        <CoursesList />
+      </Suspense>
     </div>
   );
 }

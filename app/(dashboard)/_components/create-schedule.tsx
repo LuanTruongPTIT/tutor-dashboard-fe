@@ -34,7 +34,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, CheckIcon, ChevronsUpDown } from "lucide-react";
+import { CalendarIcon, Check, CheckIcon, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Command,
@@ -48,6 +48,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import "antd/lib/date-picker/style";
 import dayjs, { Dayjs } from "dayjs";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 const initialValues = {
   dateTime: new Date(),
   // description: "",
@@ -64,7 +66,7 @@ export const CreateSchedule = z.object({
   courses: z.string().min(1, { message: "Please select a valid value" }),
   subject: z.string(), // Fix: Provide the missing argument for z.array()
   dateTime: z.date(),
-  endTime: dayjsZodSchema,
+  startAndEndTime: dayjsZodSchema,
 });
 const subjects = [
   {
@@ -86,7 +88,10 @@ export function DialogDemo() {
       courses: "",
       subject: "",
       dateTime: new Date(),
-      endTime: [dayjs("00:00:00", "HH:mm:ss"), dayjs("00:00:00", "HH:mm:ss")],
+      startAndEndTime: [
+        dayjs("00:00:00", "HH:mm:ss"),
+        dayjs("00:00:00", "HH:mm:ss"),
+      ],
     },
   });
 
@@ -94,7 +99,8 @@ export function DialogDemo() {
   // const [valueSubject, setValueSubject] = useState("");
   // const [values, setValues] = useState(initialValues);
   function processForm(data: TypeCreateSchedule) {
-    data.endTime.map((item) => {
+    console.log(data);
+    data.startAndEndTime.map((item) => {
       console.log(item.format("HH:mm:ss"));
     });
   }
@@ -214,62 +220,66 @@ export function DialogDemo() {
                 control={form.control}
                 name="dateTime"
                 render={({ field }) => (
-                  <FormItem>
-                    <div className="grid grid-row-4 items-center gap-4 py-1">
-                      <FormLabel>Select Date and Start Time</FormLabel>
-                      <FormControl>
-                        <ReactDatePicker
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Start Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
                           selected={field.value}
-                          onChange={(date) => field.onChange(date)}
-                          showTimeSelect
-                          timeFormat="HH:mm"
-                          timeIntervals={15}
-                          timeCaption="time"
-                          dateFormat="MMMM d, yyyy h:mm aa"
-                          className="w-full rounded p-2 focus:outline-none"
+                          onSelect={field.onChange}
+                          initialFocus
                         />
-                      </FormControl>
-                    </div>
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                      Your date of birth is used to calculate your age.
+                    </FormDescription>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="endTime"
+                name="startAndEndTime"
                 render={({ field }) => (
                   <div className="grid grid-row-4 items-center gap-4 py-1">
                     <FormLabel>End Time</FormLabel>
                     <FormItem>
                       <FormControl>
-                        {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DemoContainer components={["TimePicker"]}>
-                            <TimePicker
-                              label="Basic time picker"
-                              onChange={(date) => field.onChange(dayjs(date))}
-                              value={field.value ? dayjs(field.value) : null}
-                            />
-                          </DemoContainer>
-                        </LocalizationProvider> */}
-
                         <TimePicker.RangePicker
                           onChange={(vals) =>
                             vals
-                              ? form.setValue("endTime", vals as Dayjs[])
-                              : form.setValue("endTime", [])
+                              ? form.setValue("startAndEndTime", [
+                                  dayjs(vals[0], "HH:mm:ss"),
+                                  dayjs(vals[1], "HH:mm:ss"),
+                                ])
+                              : form.setValue("startAndEndTime", [])
                           }
                           value={
                             field.value
                               ? [field.value[0], field.value[1]]
                               : undefined
                           }
-
-                          // className="hover:bg-red-400 bg-background"
                         />
-                        {/* <RHFDatePickerField
-                          placeholder="End Date"
-                          control={form.control}
-                          name="endTime"
-                        /> */}
                       </FormControl>
                       {/* <FormMessage /> */}
                     </FormItem>
@@ -277,51 +287,11 @@ export function DialogDemo() {
                 )}
               />
             </div>
-            {/* <SheetFooter>
-              <SheetClose asChild> */}
+
             <Button>Save changes</Button>
-            {/* </SheetClose>
-            </SheetFooter> */}
           </form>
         </Form>
       </SheetContent>
     </Sheet>
   );
 }
-// interface RHFDatePickerFieldProps {
-//   control: Control<any>;
-//   name: string;
-//   placeholder?: string;
-// }
-
-// const RHFDatePickerField = (props: RHFDatePickerFieldProps) => {
-//   const [valus, setValues] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>([
-//     dayjs("00:00:00", "HH:mm:ss"),
-//     dayjs("00:00:00", "HH:mm:ss"),
-//   ]);
-//   console.log(valus);
-//   return (
-//     <Controller
-//       control={props.control}
-//       name={props.name}
-//       rules={{
-//         required: "This field is required",
-//       }}
-//       render={({ field, fieldState }) => {
-//         return (
-//           <>
-//             <TimePicker.RangePicker
-
-//               onChange={(vals) => form.setValue("endTime", vals)}
-//               value={valus ? valus : undefined}
-//             />
-//             <br />
-//             {fieldState.error ? (
-//               <span style={{ color: "red" }}>{fieldState.error?.message}</span>
-//             ) : null}
-//           </>
-//         );
-//       }}
-//     />
-//   );
-// };

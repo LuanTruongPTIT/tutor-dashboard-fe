@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-
+import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import ThemeToggle from "./theme-toggle";
 import { UserNav } from "./user-nav";
