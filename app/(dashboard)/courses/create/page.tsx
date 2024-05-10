@@ -21,28 +21,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Suspense } from "react";
 import Loading from "@/app/loading";
-
-const formSchema = z.object({
-  title: z.string().min(1, {
-    message: "Title is required",
-  }),
-});
+import { courseApiRequests, CreateCourseBodyType } from "@/apiRequests/course";
 
 const CreatePage = () => {
   const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof CreateCourseBodyType>>({
+    resolver: zodResolver(CreateCourseBodyType),
     defaultValues: {
-      title: "",
+      name: "",
     },
   });
 
   const { isSubmitting, isValid } = form.formState;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: CreateCourseBodyType) => {
     try {
-      const response = await axios.post("/api/courses", values);
-      router.push(`/teacher/courses/${response.data.id}`);
+      const response = await courseApiRequests.createCourse(values);
+      // router.push(`/courses/course-detail/${response.data.id}`);
       toast.success("Course created");
     } catch {
       toast.error("Something went wrong");
@@ -65,7 +60,7 @@ const CreatePage = () => {
             >
               <FormField
                 control={form.control}
-                name="title"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Course title</FormLabel>
