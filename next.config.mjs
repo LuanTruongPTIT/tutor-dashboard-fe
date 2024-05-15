@@ -15,6 +15,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "img-c.udemycdn.com",
       },
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+      },
     ],
   },
 };
