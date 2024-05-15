@@ -1,5 +1,6 @@
 import { Icons } from "@/components/icons";
 import { NavItem, SidebarNavItem } from "@/types";
+import { z } from "zod";
 
 export type User = {
   id: number;
@@ -125,10 +126,16 @@ export const navItems: NavItem[] = [
     label: "student",
   },
   {
-    title: "Courses",
+    title: "Course",
     href: "/courses",
     icon: "user",
-    label: "student",
+    label: "course",
+  },
+  {
+    title: "Course Progress",
+    href: "/courses/course-progress",
+    icon: "chart",
+    label: "Course Progress",
   },
 ];
 export type Course = {
@@ -283,6 +290,7 @@ import {
   QuestionMarkCircledIcon,
   StopwatchIcon,
 } from "@radix-ui/react-icons";
+import { start } from "repl";
 
 export const labels = [
   {
@@ -344,7 +352,6 @@ export const priorities = [
     icon: ArrowUpIcon,
   },
 ];
-import { z } from "zod";
 
 export const taskSchema = z.object({
   id: z.string(),
@@ -371,3 +378,37 @@ export const scheduleSchema = z.object({
 });
 
 export type Schedule = z.infer<typeof scheduleSchema>;
+
+export const StudentSchema = z.object({
+  fullName: z.string(),
+  email: z.string().email(),
+  country: z
+    .string()
+    .min(2, { message: "Country must be at least 2 characters long." }),
+  address: z.string().min(5, {}),
+  phone: z
+    .string()
+    .min(10, { message: "Phone number must be at least 10 characters long." }),
+  gender: z.string(),
+  level: z.string(),
+  school: z.string(),
+  dateOfBirth: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
+    message: "Start date should be in the format YYYY-MM-DD",
+  }),
+  status: z.string(),
+  imageUrl: z.string(),
+});
+export type StudentSchemaType = z.infer<typeof StudentSchema>;
+
+export const StudentCourseProgress = z.object({
+  student: z.string(),
+  imageUrl: z.string(),
+  progress: z.string(),
+  course: z.string(),
+  start_date: z.string(),
+  end_date: z.string(),
+  status: z.string(),
+  total_chapter: z.number(),
+  completed_chapter: z.number(),
+});
+export type StudentCourseProgressType = z.infer<typeof StudentCourseProgress>;
