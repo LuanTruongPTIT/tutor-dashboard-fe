@@ -196,7 +196,7 @@ const request = async <Response>(
         await clientLogoutRequest;
         localStorage.removeItem("profile");
         clientLogoutRequest = null;
-        location.href = "/auth/login";
+        location.href = "/";
       } else if (Number(res.status) === 404) {
         throw new NotFoundError(data as { status: 404; payload: any });
       } else {

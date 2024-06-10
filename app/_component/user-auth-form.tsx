@@ -20,9 +20,10 @@ import {
 } from "@/components/ui/form";
 import { useMutation } from "@tanstack/react-query";
 import { authApiRequests, TypeResponseLogin } from "@/apiRequests/auth";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { useUser } from "@/context/app.context";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -45,6 +46,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         const result = await authApiRequests.login(data);
         return result;
       } catch (error: any) {
+        console.log(error.payload.message);
         throw new Error(error.payload.message);
       }
     },
@@ -55,11 +57,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         body: JSON.stringify(data),
         headers: { "Content-type": "application/json; charset=UTF-8" },
       });
-      setProfile(data.user);
+      setProfile(data.payload.user);
       router.push("/schedule");
     },
     onError: (error: any) => {
-      toast.error(error);
+      toast.error(error.message);
     },
   });
 

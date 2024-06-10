@@ -1,15 +1,22 @@
 import { cookies } from "next/headers";
 export async function POST(request: Request) {
-  const body = await request.json();
-
+  const data = await request.json();
+  const body = data.payload;
   const accessToken = body.accesstoken as string;
   const expiresAtAccessToken = body.exipresInAccessToken as string;
 
   const refreshToken = body.refreshtoken as string;
   const expiresAtRefreshToken = body.expiresInRefreshToken as string;
   const role = body.role as string;
+  console.log(
+    accessToken,
+    expiresAtAccessToken,
+    refreshToken,
+    expiresAtRefreshToken,
+    role
+  );
   if (!accessToken && !refreshToken) {
-    return Response.json({ message: "Token invalid" }, { status: 400 });
+    return Response.json({ message: "Token invalid" }, { status: 401 });
   }
   const expiresAccessTokenDate = new Date(expiresAtAccessToken).toUTCString();
   const expiresRefreshToken = new Date(expiresAtRefreshToken).toUTCString();
