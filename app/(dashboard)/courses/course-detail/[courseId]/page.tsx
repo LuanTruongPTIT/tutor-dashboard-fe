@@ -1,12 +1,4 @@
-import { auth } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
-import {
-  CircleDollarSign,
-  File,
-  LayoutDashboard,
-  ListChecks,
-} from "lucide-react";
-
+"use client";
 import { IconBadge } from "@/components/icon-badge";
 import { Banner } from "@/components/banner";
 import { PriceForm } from "@/app/_component/price-form";
@@ -18,94 +10,97 @@ import { ChaptersForm } from "@/app/_component/chapters-form";
 import { AttachmentForm } from "@/app/_component/attached-form";
 import { CategoryForm } from "@/app/_component/category-form";
 import { Course } from "@/constants/data";
+import { useQuery } from "@tanstack/react-query";
+import { courseApiRequests } from "@/apiRequests/course";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  CircleDollarSign,
+  File,
+  LayoutDashboard,
+  ListChecks,
+} from "lucide-react";
+export type data = {
+  dstatus: number;
+  payload: any;
+};
+// eslint-disable-next-line @next/next/no-async-client-component
+const courses_init = {
+  id: "",
 
+  title: "",
+  description: "",
+  imageUrl: "",
+  category: null,
+  chapters: [],
+  price: 0,
+  userId: "",
+  isPublished: false,
+  createdAt: "",
+  updatedAt: "",
+  chapter: [],
+  attachments: [],
+  purchases: [],
+};
+//  id: string;
+//   userId: string;
+//   title: string;
+//   description?: string | null;
+//   imageUrl?: string | null;
+//   price?: number | null;
+//   isPublished: boolean;
+//   categoryId?: string | null;
+//   category?: Category | null;
+//   chapters: Chapter[];
+//   attachments: Attachment[];
+//   purchases: Purchase[];
+//   createdAt: Date;
+//   updatedAt: Date;
+// };
+// eslint-disable-next-line @next/next/no-async-client-component
 const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
-  const course: Course = {
-    id: "1",
-    userId: "user1",
-    title: "Math Course",
-    description: "This is a math course",
-    imageUrl: "https://img-c.udemycdn.com/course/480x270/4174580_dd1c.jpg",
-    price: 100.0,
-    isPublished: true,
-    categoryId: "category1",
+  const courses_init = {
+    id: "",
+    title: "",
+    description: "",
+    imageUrl: "",
+    category: null,
+    chapters: [],
+    price: 0,
+    userId: "",
+    isPublished: false,
     createdAt: new Date(),
     updatedAt: new Date(),
-    chapters: [
-      {
-        id: "1",
-        title: "Chapter 1",
-        description: "This is chapter 1",
-        videoUrl: "http://example.com/video1.mp4",
-        position: 1,
-        isPublished: true,
-        isFree: true,
-        // muxData: {
-        //   id: "1",
-        //   assetId: "asset1",
-        //   playbackId: "playback1",
-        //   chapterId: "1",
-        //   chapter: null
-        // },
-        courseId: "course1",
-        // course: null,
-        userProgress: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "2",
-        title: "Chapter 2",
-        description: "This is chapter 2",
-        videoUrl: "http://example.com/video1.mp4",
-        position: 2,
-        isPublished: true,
-        isFree: true,
-        // muxData: {
-        //   id: "1",
-        //   assetId: "asset1",
-        //   playbackId: "playback1",
-        //   chapterId: "1",
-        //   chapter: null
-        // },
-        courseId: "course1",
-        // course: null,
-        userProgress: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "3",
-        title: "Chapter 3",
-        description: "This is chapter 3",
-        videoUrl: "http://example.com/video1.mp4",
-        position: 3,
-        isPublished: true,
-        isFree: true,
-        // muxData: {
-        //   id: "1",
-        //   assetId: "asset1",
-        //   playbackId: "playback1",
-        //   chapterId: "1",
-        //   chapter: null
-        // },
-        courseId: "course1",
-        // course: null,
-        userProgress: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
+
     attachments: [],
     purchases: [],
   };
+  const [course, setCourse] = useState<Course>(courses_init);
+  const router = useRouter();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["courses", params.courseId],
+    queryFn: () => {
+      return courseApiRequests.getCourses(Number(params.courseId));
+    },
+    retry: 0,
+  });
+
+  useEffect(() => {
+    if (data) {
+      setCourse(data.payload.data.course);
+    }
+    if (error) {
+      router.push("/courses/create");
+    }
+  }, [data, error, router]);
+  //
   const categories = [{ name: "python", id: "python" }];
   return (
     <>
-      {/* {!course.isPublished && (
+      {course && !course.isPublished && (
         <Banner label="This course is unpublished. It will not be visible to the students." />
-      )} */}
-
+      )}
       <div className="overflow-y-auto h-full p-6">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-y-2">
@@ -128,13 +123,13 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
               <IconBadge icon={LayoutDashboard} />
               <h2 className="text-xl">Customize your course</h2>
             </div>
+            <TitleForm initialData={course} courseId={params.courseId} />
 
-            <TitleForm initialData={{ title: "python" }} courseId={"10"} />
-            <DescriptionForm initialData={course} courseId={"10"} />
-            <ImageForm initialData={course} courseId={course.id} />
+            <DescriptionForm initialData={course} courseId={params.courseId} />
+            <ImageForm initialData={course} courseId={params.courseId} />
             <CategoryForm
               initialData={course}
-              courseId={course.id}
+              courseId={params.courseId}
               options={categories.map((category) => ({
                 label: category.name,
                 value: category.id,
@@ -147,21 +142,21 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
                 <IconBadge icon={ListChecks} />
                 <h2 className="text-xl">Course chapters</h2>
               </div>
-              <ChaptersForm initialData={course} courseId={course.id} />
+              <ChaptersForm initialData={course} courseId={params.courseId} />
             </div>
             <div>
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={CircleDollarSign} />
                 <h2 className="text-xl">Sell your course</h2>
               </div>
-              <PriceForm initialData={course} courseId={course.id} />
+              <PriceForm initialData={course} courseId={params.courseId} />
             </div>
             <div>
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={File} />
                 <h2 className="text-xl">Resources & Attachments</h2>
               </div>
-              <AttachmentForm initialData={course} courseId={course.id} />
+              {/* <AttachmentForm initialData={course} courseId={params.courseId} /> */}
             </div>
           </div>
         </div>
@@ -169,5 +164,4 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
     </>
   );
 };
-
 export default CourseIdPage;

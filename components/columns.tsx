@@ -7,10 +7,39 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
+import {
+  ActivityLogIcon,
+  Cross2Icon,
+  CrossCircledIcon,
+  StopwatchIcon,
+} from "@radix-ui/react-icons";
+import { labels, StudentSchemaType, Task } from "@/constants/data";
+import { Avatar, AvatarImage } from "./ui/avatar";
+import EditStudents from "@/app/(dashboard)/student/_components/student-detail";
 
-import { labels, statuses, Task } from "@/constants/data";
-
-export const columns: ColumnDef<Task>[] = [
+export const statuses_student = [
+  {
+    value: "Active",
+    label: "Active",
+    icon: ActivityLogIcon,
+  },
+  {
+    value: "Inactive",
+    label: "Inactive",
+    icon: StopwatchIcon,
+  },
+  {
+    value: "Suspended",
+    label: "Suspended",
+    icon: Cross2Icon,
+  },
+  {
+    value: "Deleted",
+    label: "Deleted",
+    icon: CrossCircledIcon,
+  },
+];
+export const columns: ColumnDef<StudentSchemaType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -36,153 +65,121 @@ export const columns: ColumnDef<Task>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
+    accessorKey: "imageUrl",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Task" />
+      <DataTableColumnHeader column={column} title="Avatar" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+    cell: ({ row }) => {
+      return (
+        <Avatar>
+          <AvatarImage src={row.original.imageUrl} alt="@shadcn" />
+        </Avatar>
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "title",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Title" />
-    ),
-    cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
-      return (
-        <div className="flex space-x-2">
-          {label && <Badge variant="outline">{label.label}</Badge>}
-          <span className="max-w-[100px] truncate font-medium">
-            {row.getValue("title")}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "code",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Code" />
-    ),
-    cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
-      return (
-        <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("code")}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "FullName",
+    accessorKey: "fullName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="FullName" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
       return (
         <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[100px] truncate font-medium">
-            {row.getValue("FullName")}
+          <span className="max-w-[200px] truncate font-medium">
+            {row.getValue("fullName")}
           </span>
         </div>
       );
     },
   },
+
   {
-    accessorKey: "Attendance",
+    accessorKey: "email",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Attendance" />
+      <DataTableColumnHeader column={column} title="Email" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
       return (
         <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[100px] truncate font-medium">
-            {/* {row.getValue("code")} */}
+          <span className="max-w-[200px] truncate font-medium">
+            {row.getValue("email")}
           </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "Level",
+    accessorKey: "country",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Level" />
+      <DataTableColumnHeader column={column} title="Country" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
       return (
         <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className="max-w-[100px] truncate font-medium">
-            {/* {row.getValue("code")} */}
+            {row.getValue("country")}
           </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "Phone",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phone" />
-    ),
-    cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
-      return (
-        <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[100px] truncate font-medium">
-            {/* {row.getValue("code")} */}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "Address",
+    accessorKey: "address",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Address" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
       return (
         <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className="max-w-[100px] truncate font-medium">
-            {/* {row.getValue("code")} */}
+            {row.getValue("address")}
           </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "Family",
+    accessorKey: "phone",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Family" />
+      <DataTableColumnHeader column={column} title="Phone" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
       return (
         <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className="max-w-[100px] truncate font-medium">
-            {/* {row.getValue("code")} */}
+            {row.getValue("phone")}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "gender",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Gender" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[100px] truncate font-medium">
+            {row.getValue("gender")}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "level",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Level" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[100px] truncate font-medium">
+            {row.getValue("level")}
           </span>
         </div>
       );
@@ -194,7 +191,7 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = statuses.find(
+      const status = statuses_student.find(
         (status) => status.value === row.getValue("status")
       );
 
@@ -215,9 +212,14 @@ export const columns: ColumnDef<Task>[] = [
       return value.includes(row.getValue(id));
     },
   },
-
+  {
+    id: "detail",
+    cell: ({ row }) => <EditStudents />,
+  },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => (
+      <DataTableRowActions row={row} status={statuses_student} />
+    ),
   },
 ];

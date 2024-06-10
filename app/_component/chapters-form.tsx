@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Chapter, Course } from "@/constants/data";
 import { ChaptersList } from "./chapter-list";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { courseApiRequests } from "@/apiRequests/course";
 
 interface ChaptersFormProps {
   initialData: Course & { chapters: Chapter[] };
@@ -33,7 +35,7 @@ const formSchema = z.object({
 export const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-
+  const queryClient = useQueryClient();
   const toggleCreating = () => {
     setIsCreating((current) => !current);
   };
@@ -48,26 +50,38 @@ export const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
   });
 
   const { isSubmitting, isValid } = form.formState;
+  const useCteateChapter = useMutation({
+    mutationFn: async (values: { title: string }) => {
+      console.log("values", values);
+      try {
+        return await courseApiRequests.createChapter(Number(courseId), values);
+      } catch (error: any) {
+        throw new Error(error.payload.message);
+      }
+    },
+    onSuccess: async (result: any) => {
+      await queryClient.setQueryData(["courses", courseId], (oldData: any) => {
+        return {
+          ...result,
+        };
+      });
+      toast.success("Create chapter success!");
+      toggleCreating();
+    },
+  });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("values", values);
-    try {
-      await axios.post(`/api/courses/${courseId}/chapters`, values);
-      toast.success("Chapter created");
-      toggleCreating();
-      router.refresh();
-    } catch {
-      toast.error("Something went wrong");
-    }
+    useCteateChapter.mutate(values);
   };
 
   const onReorder = async (updateData: { id: string; position: number }[]) => {
     try {
       setIsUpdating(true);
 
-      await axios.put(`/api/courses/${courseId}/chapters/reorder`, {
-        list: updateData,
-      });
+      await courseApiRequests.updateChapterReorder(
+        Number(courseId),
+        updateData
+      );
       toast.success("Chapters reordered");
       router.refresh();
     } catch {

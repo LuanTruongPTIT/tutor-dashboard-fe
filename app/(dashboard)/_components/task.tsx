@@ -84,7 +84,7 @@ const status = [
 
 export default function Task() {
   const [isDelete, setIsDelete] = useState(false);
-  // console.log("vao day", isOpen);
+
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
 

@@ -48,7 +48,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         throw new Error(error.payload.message);
       }
     },
-    onSuccess: async (data: TypeResponseLogin) => {
+    onSuccess: async (data: any) => {
       console.log(data);
       await fetch("http://localhost:3001/api/auth", {
         method: "POST",

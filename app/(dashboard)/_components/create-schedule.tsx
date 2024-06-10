@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { z } from "zod";
+import { any, z } from "zod";
 import { Control, Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DatePicker, TimePicker } from "antd";
@@ -50,6 +50,28 @@ import "antd/lib/date-picker/style";
 import dayjs, { Dayjs } from "dayjs";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import React from "react";
+
+import {
+  Popover as Popoverui,
+  PopoverTrigger as PopoverTriggerui,
+  PopoverContent as PopoverContentui,
+  Button as Buttonui,
+  Select,
+  SelectItem,
+  Selection,
+} from "@nextui-org/react";
+
+import {
+  Listbox,
+  ListboxItem,
+  Chip,
+  ScrollShadow,
+  Avatar as Avatarui,
+} from "@nextui-org/react";
+import { ZonedDateTime } from "@internationalized/date";
+import { duration } from "@mui/material";
+
 const initialValues = {
   dateTime: new Date(),
   // description: "",
@@ -59,15 +81,35 @@ const dayjsZodSchema = z.custom<dayjs.Dayjs[]>(
   (value) => Array.isArray(value) && value.every(dayjs.isDayjs),
   { message: "Expected an array of Dayjs objects" }
 );
+export const users = [
+  {
+    id: 1,
+    name: "Tony Reichert",
+    role: "CEO",
+    team: "Management",
+    status: "active",
+    age: "29",
+    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/1.png",
+    email: "tony.reichert@example.com",
+  },
+  {
+    id: 2,
+    name: "Zoey Lang",
+    role: "Tech Lead",
+    team: "Development",
+    status: "paused",
+    age: "25",
+    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/1.png",
+    email: "zoey.lang@example.com",
+  },
+];
+const stringSetSchema = z.custom<Selection>(
+  (value) =>
+    value instanceof Set &&
+    Array.from(value).every((item) => typeof item === "string"),
+  { message: "Please select student" }
+);
 
-export const CreateSchedule = z.object({
-  topic: z.string().min(1, { message: "Please enter a valid value" }),
-  description: z.string(),
-  courses: z.string().min(1, { message: "Please select a valid value" }),
-  subject: z.string(), // Fix: Provide the missing argument for z.array()
-  dateTime: z.date(),
-  startAndEndTime: dayjsZodSchema,
-});
 const subjects = [
   {
     value: "math",
@@ -78,20 +120,14 @@ const subjects = [
     label: "React",
   },
 ];
-export type TypeCreateSchedule = z.infer<typeof CreateSchedule>;
-export function DialogDemo() {
+
+export function CreateTimeTable() {
   const form = useForm<TypeCreateSchedule>({
     resolver: zodResolver(CreateSchedule),
     defaultValues: {
       topic: "",
       description: "",
-      courses: "",
-      subject: "",
-      dateTime: new Date(),
-      startAndEndTime: [
-        dayjs("00:00:00", "HH:mm:ss"),
-        dayjs("00:00:00", "HH:mm:ss"),
-      ],
+      course: "",
     },
   });
 
@@ -216,6 +252,7 @@ export function DialogDemo() {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="dateTime"

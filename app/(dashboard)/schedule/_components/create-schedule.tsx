@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { DialogDemo } from "../../_components/create-schedule";
+
 import Image from "next/image";
+import { CreateTimeTable } from "../../_components/create-timetable";
 
 export function CreateSchedule() {
   return (
@@ -23,7 +24,7 @@ export function CreateSchedule() {
           </div>
         </div>
         <div>
-          <DialogDemo />
+          <CreateTimeTable />
         </div>
       </CardContent>
     </Card>

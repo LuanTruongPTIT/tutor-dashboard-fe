@@ -128,7 +128,7 @@ export const navItems: NavItem[] = [
   {
     title: "Course",
     href: "/courses",
-    icon: "user",
+    icon: "course",
     label: "course",
   },
   {
@@ -136,6 +136,18 @@ export const navItems: NavItem[] = [
     href: "/courses/course-progress",
     icon: "chart",
     label: "Course Progress",
+  },
+  {
+    title: "Attendance",
+    href: "/attendance",
+    icon: "attendance",
+    label: "Attendance",
+  },
+  {
+    title: "Profile",
+    href: "/profile",
+    icon: "profiles",
+    label: "Profile",
   },
 ];
 export type Course = {
@@ -365,15 +377,15 @@ export const taskSchema = z.object({
 export type Task = z.infer<typeof taskSchema>;
 
 export const scheduleSchema = z.object({
-  id: z.string(),
-  topic: z.string(),
-  description: z.string(),
-  formal: z.string(),
-  date: z.string(),
+  id: z.number(),
+  topic: z.string().optional(),
+  description: z.string().optional(),
+  room: z.string().optional(),
+  formal: z.string().optional(),
+  date: z.string().optional(),
   course: z.string().optional(),
   chapter: z.string().optional(),
-  startTime: z.string(),
-  endTime: z.string(),
+  endTime: z.string().optional(),
   status: z.string(),
 });
 

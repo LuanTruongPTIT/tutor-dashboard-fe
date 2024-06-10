@@ -5,7 +5,13 @@ type CustomOptions = Omit<RequestInit, "method"> & {
 };
 const ENTITY_ERROR_STATUS = 422;
 const AUTHENTICATION_ERROR_STATUS = 401;
-const http400 = 400;
+const BAD_REQUEST_ERROR = 400;
+const NOT_FOUND_ERROR = 404;
+enum HttpStatusCode {
+  UNAUTHORIZED = 401,
+  NOT_FOUND = 404,
+  // các mã lỗi khác
+}
 type EntityErrorPayload = {
   message: string;
   errors: {
@@ -13,6 +19,11 @@ type EntityErrorPayload = {
     message: string;
   }[];
 };
+type BadRequesError = {
+  message: string;
+  status: number;
+};
+
 export class HttpError extends Error {
   status: number;
   payload: {
@@ -34,7 +45,22 @@ export class EntityError extends HttpError {
     this.status = status;
   }
 }
-
+export class BadRequestError extends HttpError {
+  status: 400;
+  payload: BadRequesError;
+  constructor({ status, payload }: { status: 400; payload: any }) {
+    super({ status, payload });
+    this.payload = payload;
+    this.status = status;
+  }
+}
+export class NotFoundError extends HttpError {
+  status: 404;
+  constructor({ status, payload }: { status: 404; payload: any }) {
+    super({ status, payload });
+    this.status = status;
+  }
+}
 const http = {
   get<Response>(
     url: string,
@@ -149,6 +175,13 @@ const request = async <Response>(
           payload: EntityErrorPayload;
         }
       );
+    } else if (res.status === BAD_REQUEST_ERROR) {
+      throw new BadRequestError(
+        data as {
+          status: 400;
+          payload: BadRequesError;
+        }
+      );
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
       if (typeof window !== "undefined") {
         if (!clientLogoutRequest) {
@@ -164,6 +197,8 @@ const request = async <Response>(
         localStorage.removeItem("profile");
         clientLogoutRequest = null;
         location.href = "/auth/login";
+      } else if (Number(res.status) === 404) {
+        throw new NotFoundError(data as { status: 404; payload: any });
       } else {
         const accesstoken = (options?.headers as any)?.Authorization.split(
           "Bearer"
@@ -173,5 +208,5 @@ const request = async <Response>(
       }
     }
   }
-  return payload as Response;
+  return data;
 };

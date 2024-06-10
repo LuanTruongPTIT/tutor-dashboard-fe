@@ -1,6 +1,6 @@
 import { nextui } from "@nextui-org/react";
 import type { Config } from "tailwindcss";
-
+import { withUt } from "uploadthing/tw";
 const config = {
   darkMode: ["class"],
   important: true,

@@ -1,14 +1,11 @@
 "use client";
 
 import * as z from "zod";
-import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-
 import {
   Form,
   FormControl,
@@ -18,11 +15,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Course } from "@/constants/data";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { courseApiRequests } from "@/apiRequests/course";
 
 interface TitleFormProps {
-  initialData: {
-    title: string;
-  };
+  initialData: Course;
   courseId: string;
 }
 
@@ -36,8 +34,7 @@ export const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const toggleEdit = () => setIsEditing((current) => !current);
-
-  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,16 +42,31 @@ export const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
   });
 
   const { isSubmitting, isValid } = form.formState;
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course updated");
+  const useUpdateTitle = useMutation({
+    mutationFn: async (values: { title: string }) => {
+      try {
+        return await courseApiRequests.courseUpdate(Number(courseId), values);
+      } catch (error: any) {
+        throw new Error(error.payload.message);
+      }
+    },
+    onSuccess: async (result: any) => {
+      const data = result.payload.data.course;
+      toast.success("Update description success!");
       toggleEdit();
-      router.refresh();
-    } catch {
+      await queryClient.setQueryData(["courses", courseId], (oldData: any) => {
+        oldData.payload.data.course.title = data.title;
+        return {
+          ...oldData,
+        };
+      });
+    },
+    onError: (error: any) => {
       toast.error("Something went wrong");
-    }
+    },
+  });
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    useUpdateTitle.mutate(values);
   };
 
   return (

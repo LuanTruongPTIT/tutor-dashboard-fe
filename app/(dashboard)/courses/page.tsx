@@ -4,6 +4,7 @@ import Breadcrumb from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Toaster } from "sonner";
 const breadcrumbItems = [{ title: "Course", link: "/courses" }];
 export default function Courses() {
   return (

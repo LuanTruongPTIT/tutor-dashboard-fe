@@ -12,6 +12,10 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { FileUpload } from "./file-upload";
 import { Course } from "@/constants/data";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { courseApiRequests } from "@/apiRequests/course";
 
 interface ImageFormProps {
   initialData: Course;
@@ -27,20 +31,33 @@ const formSchema = z.object({
 
 export const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
-
+  const queryClient = useQueryClient();
   const toggleEdit = () => setIsEditing((current) => !current);
 
   const router = useRouter();
+  const useUpdateImage = useMutation({
+    mutationFn: async (values: { imageUrl: string }) => {
+      try {
+        return await courseApiRequests.courseUpdate(Number(courseId), values);
+      } catch (error: any) {
+        throw new Error(error.payload.message);
+      }
+    },
+    onSuccess: async (result: any) => {
+      const data = result.payload.data.course;
+      toast.success("Update description success!");
+      toggleEdit();
+      await queryClient.setQueryData(["courses", courseId], (oldData: any) => {
+        oldData.payload.data.course.imageUrl = data.imageUrl;
+        return {
+          ...oldData,
+        };
+      });
+    },
+  });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course updated");
-      toggleEdit();
-      router.refresh();
-    } catch {
-      toast.error("Something went wrong");
-    }
+    useUpdateImage.mutate(values);
   };
 
   return (
@@ -49,13 +66,13 @@ export const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
         Course image
         <Button onClick={toggleEdit} variant="ghost">
           {isEditing && <>Cancel</>}
-          {!isEditing && !initialData && (
+          {!isEditing && !initialData.imageUrl && (
             <>
               <PlusCircle className="h-4 w-4 mr-2" />
               Add an image
             </>
           )}
-          {!isEditing && initialData && (
+          {!isEditing && initialData.imageUrl && (
             <>
               <Pencil className="h-4 w-4 mr-2" />
               Edit image
@@ -64,7 +81,7 @@ export const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
         </Button>
       </div>
       {!isEditing &&
-        (!initialData ? (
+        (!initialData.imageUrl ? (
           <div className="flex items-center justify-center h-60  rounded-md">
             <ImageIcon className="h-10 w-10 text-slate-500" />
           </div>
@@ -81,8 +98,9 @@ export const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
       {isEditing && (
         <div>
           <FileUpload
-            endpoint="courseImage"
+            endpoint="imageUploader"
             onChange={(url) => {
+              console.log(url);
               if (url) {
                 onSubmit({ imageUrl: url });
               }

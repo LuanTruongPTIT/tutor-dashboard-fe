@@ -16,6 +16,5 @@ const TypeResponseLogin = z.object({
 });
 export type TypeResponseLogin = z.infer<typeof TypeResponseLogin>;
 export const authApiRequests = {
-  login: (body: LoginBodyType) =>
-    http.post<TypeResponseLogin>("api/auth/sign-in/tutor", body),
+  login: (body: LoginBodyType) => http.post("api/auth/sign-in/tutor", body),
 };

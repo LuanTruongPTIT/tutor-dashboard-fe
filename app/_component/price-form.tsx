@@ -21,6 +21,8 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { formatPrice } from "@/lib/format";
 import { Course } from "@/constants/data";
+import { courseApiRequests } from "@/apiRequests/course";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface PriceFormProps {
   initialData: Course;
@@ -35,7 +37,7 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const toggleEdit = () => setIsEditing((current) => !current);
-
+  const queryClient = useQueryClient();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,16 +48,31 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
   });
 
   const { isSubmitting, isValid } = form.formState;
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course updated");
+  const useUpdatePrice = useMutation({
+    mutationFn: async (values: { price: number }) => {
+      try {
+        return await courseApiRequests.courseUpdate(Number(courseId), values);
+      } catch (error: any) {
+        throw new Error(error.payload.message);
+      }
+    },
+    onSuccess: async (result: any) => {
+      const data = result.payload.data.course;
+      toast.success("Update description success!");
       toggleEdit();
-      router.refresh();
-    } catch {
+      await queryClient.setQueryData(["courses", courseId], (oldData: any) => {
+        oldData.payload.data.course.price = data.price;
+        return {
+          ...oldData,
+        };
+      });
+    },
+    onError: (error: any) => {
       toast.error("Something went wrong");
-    }
+    },
+  });
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    useUpdatePrice.mutate(values);
   };
 
   return (

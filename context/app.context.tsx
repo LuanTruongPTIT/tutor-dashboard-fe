@@ -42,9 +42,7 @@ export function UserProvider({
 }): JSX.Element {
   const [profile, setProfileState] = useState<UserProfile | null>(null);
   useState(() => {
-    console.log("out inititalAccessToken", inititalAccessToken);
     if (typeof window !== "undefined") {
-      console.log("inititalAccessToken", inititalAccessToken);
       accessToken.value = inititalAccessToken;
     }
   });

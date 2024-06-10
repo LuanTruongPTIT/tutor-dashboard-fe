@@ -1,35 +1,70 @@
-import { promises as fs } from "fs";
-import path from "path";
-import { Metadata } from "next";
-import Image from "next/image";
-import { z } from "zod";
-import { taskSchema } from "@/constants/data";
-import { DataTable } from "@/components/data-table";
+"use client";
+import { StudentSchemaType } from "@/constants/data";
+import { BeatLoader } from "react-spinners";
 import { columns } from "@/components/columns";
+import { Heading } from "@/app/_component/heading";
+import { Separator } from "@/components/ui/separator";
+import BreadCrumb from "@/components/ui/breadcrumb";
+import AddStudent from "./_components/add-student";
+import { useQuery } from "@tanstack/react-query";
+import { tutorApiRequests } from "@/apiRequests/tutor";
+import { DataTable } from "./_components/data-table-student";
+import { useEffect, useState } from "react";
 
-export const metadata: Metadata = {
-  title: "Tasks",
-  description: "A task and issue tracker build using Tanstack Table.",
-};
+// export const metadata: Metadata = {
+//   title: "Tasks",
+//   description: "A task and issue tracker build using Tanstack Table.",
+// };
 
-// Simulate a database read for tasks.
-async function getTasks() {
-  const data = await fs.readFile(
-    path.join(process.cwd(), "app/(dashboard)/student/data/task.json")
-  );
+const breadcrumbItems = [{ title: "Student", link: "/student" }];
+export default function Page() {
+  const [result, setResult] = useState<StudentSchemaType[]>([]);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["students"],
+    queryFn: () => tutorApiRequests.GetAllStudents(),
+  });
+  useEffect(() => {
+    if (data) {
+      setResult(data.payload.data?.students);
+    }
+  }, [data]);
+  const students = data?.payload.data?.students;
 
-  const tasks = JSON.parse(data.toString());
-
-  return z.array(taskSchema).parse(tasks);
-}
-
-export default async function TaskPage() {
-  const tasks = await getTasks();
+  if (error) {
+    return (
+      <div>
+        <BeatLoader />
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
-        <DataTable data={tasks} columns={columns} />
+        <BreadCrumb items={breadcrumbItems} />
+        <div className="flex items-start justify-between">
+          <Heading
+            title={`Student (${(students && students.length) || 0})`}
+            description="Manage student"
+          />
+
+          <AddStudent />
+        </div>
+        <Separator />
+
+        {isLoading ? (
+          <div>
+            <BeatLoader />
+          </div>
+        ) : (
+          <>
+            {students.length !== 0 ? (
+              <DataTable columns={columns} data={students} />
+            ) : (
+              <div>No students found</div>
+            )}
+          </>
+        )}
       </div>
     </>
   );

@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
-import toast from "react-hot-toast";
+
 import { useRouter } from "next/navigation";
 
 import {
@@ -20,6 +20,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Course } from "@/constants/data";
+import { courseApiRequests } from "@/apiRequests/course";
+import toast from "react-hot-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface DescriptionFormProps {
   initialData: Course;
@@ -37,10 +40,9 @@ export const DescriptionForm = ({
   courseId,
 }: DescriptionFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
-
+  console.log("initialData", initialData);
   const toggleEdit = () => setIsEditing((current) => !current);
-
-  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,16 +52,32 @@ export const DescriptionForm = ({
   });
 
   const { isSubmitting, isValid } = form.formState;
+  const useUpdateDescription = useMutation({
+    mutationFn: async (values: { description: string }) => {
+      try {
+        return await courseApiRequests.courseUpdate(Number(courseId), values);
+      } catch (error: any) {
+        throw new Error(error.payload.message);
+      }
+    },
+    onSuccess: async (result: any) => {
+      const data = result.payload.data.course;
+      toast.success("Update description success!");
+      toggleEdit();
+      await queryClient.setQueryData(["courses", courseId], (oldData: any) => {
+        oldData.payload.data.course.description = data.description;
+        return {
+          ...oldData,
+        };
+      });
+    },
+    onError: (error: any) => {
+      toast.error("Something went wrong");
+    },
+  });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course updated");
-      toggleEdit();
-      router.refresh();
-    } catch {
-      toast.error("Something went wrong");
-    }
+    useUpdateDescription.mutate(values);
   };
 
   return (

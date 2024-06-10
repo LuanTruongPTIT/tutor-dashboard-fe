@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import toast from "react-hot-toast";
 
 import {
   Form,
@@ -22,25 +21,36 @@ import { Input } from "@/components/ui/input";
 import { Suspense } from "react";
 import Loading from "@/app/loading";
 import { courseApiRequests, CreateCourseBodyType } from "@/apiRequests/course";
+// import { toast, useToast } from "@/components/ui/use-toast";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreatePage = () => {
   const router = useRouter();
   const form = useForm<z.infer<typeof CreateCourseBodyType>>({
     resolver: zodResolver(CreateCourseBodyType),
     defaultValues: {
-      name: "",
+      title: "",
     },
   });
-
+  // const { toast } = useToast();
   const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values: CreateCourseBodyType) => {
     try {
       const response = await courseApiRequests.createCourse(values);
-      // router.push(`/courses/course-detail/${response.data.id}`);
-      toast.success("Course created");
+      toast.success("Create Course Success!", {
+        position: "top-center",
+        autoClose: 1000,
+      });
+      setTimeout(() => {
+        router.push(`/courses/course-detail/${response.payload.data.id}`);
+      }, 1200);
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Something wrong !", {
+        position: "top-center",
+        autoClose: 1000,
+      });
     }
   };
 
@@ -60,7 +70,7 @@ const CreatePage = () => {
             >
               <FormField
                 control={form.control}
-                name="name"
+                name="title"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Course title</FormLabel>

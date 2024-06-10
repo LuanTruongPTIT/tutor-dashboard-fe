@@ -42,4 +42,7 @@ export const courseApiRequests = {
   getAllCoursesUser: () => {
     return http.get<Course[]>("/api/course/get-all-courses");
   },
+  GetCourseOfClasses: (id: number) => {
+    return http.get(`/api/room/get-course-by-class/${id}`);
+  },
 };

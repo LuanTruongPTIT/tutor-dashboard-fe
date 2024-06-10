@@ -4,7 +4,6 @@ import "./globals.css";
 import { siteConfig } from "@/config/site";
 import Providers from "./_component/providers";
 import { ConfettiProvider } from "@/components/providers/confetti-provider";
-import { NextUIProvider } from "@nextui-org/react";
 import { ProvidersNextUi } from "./_component/next-ui-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { UserProvider } from "@/context/app.context";
@@ -12,7 +11,9 @@ import { Suspense } from "react";
 import Loading from "./loading";
 import { cookies } from "next/headers";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
-import { Toaster } from "sonner";
+import { ToastContainer } from "react-toastify";
+import { Toaster } from "react-hot-toast";
+import LocalizationProviderContext from "@/context/LocalizationProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,7 +40,7 @@ export default function RootLayout({
   const sessionToken = cookieStore.get("accesstoken");
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning={true}>
         <ConfettiProvider />
         <ClerkProvider
           appearance={{
@@ -51,10 +52,15 @@ export default function RootLayout({
           <Providers>
             <ReactQueryClientProvider>
               <ProvidersNextUi>
+                {/* <EdgeStoreProvider> */}
+                <LocalizationProviderContext>
+                  <UserProvider inititalAccessToken={sessionToken?.value}>
+                    <Suspense fallback={<Loading />}>{children}</Suspense>
+                  </UserProvider>
+                </LocalizationProviderContext>
                 <Toaster />
-                <UserProvider inititalAccessToken={sessionToken?.value}>
-                  <Suspense fallback={<Loading />}>{children}</Suspense>
-                </UserProvider>
+                <ToastContainer />
+                {/* </EdgeStoreProvider> */}
               </ProvidersNextUi>
             </ReactQueryClientProvider>
           </Providers>

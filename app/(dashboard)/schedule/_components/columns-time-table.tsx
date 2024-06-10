@@ -1,30 +1,37 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-
-// import { DataTableColumnHeader } from "./data-table-column-header";
-// import { DataTableRowActions } from "./data-table-row-actions";
-
 import { labels, Schedule, statuses, Task } from "@/constants/data";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { DetailSchedule } from "../../_components/edit-schedule";
 import { cn } from "@/lib/utils";
-// export const scheduleSchema = z.object({
-//   id: z.string(),
-//   topic: z.string(),
-//   description: z.string(),
-//   formal: z.string(),
-//   date: z.string(),
-//   course: z.string().optional(),
-//   chapter: z.string().optional(),
-//   startTime: z.string(),
-//   endTime: z.string(),
-//   location: z.string().optional(),
-//   participants: z.array(z.string()).optional(),
-// });
+import { CrossCircledIcon, StopwatchIcon } from "@radix-ui/react-icons";
+import { DataTableRowActionSchedule } from "../../student/_components/data-table-row-action-schedule";
+export const statuses_schedule = [
+  {
+    value: "In Progress",
+    label: "In Progress",
+    icon: StopwatchIcon,
+  },
+
+  {
+    value: "Pending",
+    label: "Pending",
+    icon: CrossCircledIcon,
+  },
+  {
+    value: "Canceled",
+    label: "Canceled",
+    icon: CrossCircledIcon,
+  },
+  {
+    value: "Completed",
+    label: "Completed",
+    icon: CrossCircledIcon,
+  },
+];
 export const columns_time_table: ColumnDef<Schedule>[] = [
   {
     id: "select",
@@ -50,15 +57,7 @@ export const columns_time_table: ColumnDef<Schedule>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="id" />
-    ),
-    cell: ({ row }) => <div className="w-[40px]">{row.getValue("id")}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
+
   {
     accessorKey: "topic",
     header: ({ column }) => (
@@ -81,6 +80,19 @@ export const columns_time_table: ColumnDef<Schedule>[] = [
       return (
         <span className="max-w-[100px] truncate font-medium">
           {row.getValue("course")}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "room",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Class" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <span className="max-w-[100px] truncate font-medium">
+          {row.getValue("room")}
         </span>
       );
     },
@@ -134,6 +146,15 @@ export const columns_time_table: ColumnDef<Schedule>[] = [
   },
   {
     id: "detail",
-    cell: ({ row }) => <DetailSchedule />,
+    cell: ({ row }) => (
+      // console.log(row.original.id);
+      <DetailSchedule id={row.original.id} />
+    ),
+  },
+  {
+    id: "action",
+    cell: ({ row }) => (
+      <DataTableRowActionSchedule row={row} status={statuses_schedule} />
+    ),
   },
 ];
