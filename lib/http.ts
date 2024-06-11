@@ -122,6 +122,7 @@ const request = async <Response>(
   url: string,
   options?: CustomOptions | undefined
 ) => {
+  console.log(accessToken.value, accessToken.expiresAt);
   const body = options?.body
     ? options?.body
       ? options.body instanceof FormData

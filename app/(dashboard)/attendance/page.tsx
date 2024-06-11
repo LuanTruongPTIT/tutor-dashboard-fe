@@ -10,10 +10,10 @@ import { tutorApiRequests } from "@/apiRequests/tutor";
 // const attendanceList = [
 //   {
 //     attendance_id: 1,
-//     // date: "05/2024",
+//     date: "05/2024",
 //     // day: 23,
 //     room: "Python - D19",
-//     // present: true,
+//     present: true,
 //     studentId: 2,
 //   },
 // ];

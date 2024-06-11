@@ -27,7 +27,7 @@ function AttendanceGrid({
     moment(selectedMonth).format("MM")
   );
   let daysArrays = Array.from({ length: numberOfDays }, (_, i) => i + 1);
-
+  console.log(daysArrays);
   useEffect(() => {
     setColDefs([
       { field: "studentId", filter: true },
