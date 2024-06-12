@@ -77,7 +77,7 @@ export default function AboutMe({ data }: { data: ProfileType }) {
             </Form>
           )}
           {!isEditing &&
-            (data.bio ? (
+            (data?.bio ? (
               <p className="text-sm text-left text-gray-400">
                 Hello, my name is Sela, and I am a dedicated tutor committed to
                 helping students achieve their academic goals. If you have any

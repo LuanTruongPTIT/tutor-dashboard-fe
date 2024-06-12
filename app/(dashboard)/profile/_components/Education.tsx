@@ -70,9 +70,8 @@ export default function Education({ data }: { data: ProfileType }) {
       <CardContent className="w-full">
         {!isCreated && (
           <div className="flex flex-col gap-6 pt-[10px] w-full">
-        
-            {data.activities.length !== 0 ? (
-              data.activities.map((item) => (
+            {data?.activities.length !== 0 ? (
+              data?.activities.map((item) => (
                 <div className="flex flex-row items-center justify-between">
                   <div className="flex flex-row gap-8 items-center">
                     <Avatar className="h-20 w-20 bg-white object-cover">

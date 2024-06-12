@@ -28,7 +28,7 @@ export default function ProfilePhoto({ data }: { data: ProfileType }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: data.fullName ? data.fullName : "",
+      fullName: data?.fullName ? data?.fullName : "",
     },
   });
 
@@ -71,7 +71,7 @@ export default function ProfilePhoto({ data }: { data: ProfileType }) {
           )}
           {!isEditing && (
             <div className="relative w-full h-[150px] mt-2">
-              {data.imagePhoto ? (
+              {data?.imagePhoto ? (
                 <Image
                   alt="Upload"
                   fill
@@ -115,7 +115,7 @@ export default function ProfilePhoto({ data }: { data: ProfileType }) {
                 </Form>
               )}
               {!isEditing && (
-                <h3 className="font-bold text-xl">{data.fullName}</h3>
+                <h3 className="font-bold text-xl">{data?.fullName}</h3>
               )}
               {!isEditing && (
                 <span className="text-[14px] text-gray-40">

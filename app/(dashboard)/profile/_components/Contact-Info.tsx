@@ -63,7 +63,7 @@ export default function ContactInfo({ data }: { data: ProfileType }) {
               <p className="text-[16px] text-gray-500">Location</p>
               <div className="flex flex-row gap-2 items-center">
                 <MapPin className="h-[19px] text-blue-500" />
-                {data.address ? (
+                {data?.address ? (
                   <span className="text-[16px">{data.address}</span>
                 ) : (
                   <span className="text-[16px]">No address</span>
@@ -74,7 +74,7 @@ export default function ContactInfo({ data }: { data: ProfileType }) {
               <p className="text-[16px] text-gray-500">Emaill Address</p>
               <div className="flex flex-row gap-2 items-center">
                 <Mail className="h-[19px] text-blue-500" />
-                {data.email ? (
+                {data?.email ? (
                   <span className="text-[16px">{data.email}</span>
                 ) : (
                   <span className="text-[16px]">No email</span>
@@ -85,7 +85,7 @@ export default function ContactInfo({ data }: { data: ProfileType }) {
               <p className="text-[16px] text-gray-500">Phone Number</p>
               <div className="flex flex-row gap-2">
                 <Phone className="h-[19px] text-blue-500" />
-                {data.phone_number ? (
+                {data?.phone_number ? (
                   <span className="text-[16px">{data.phone_number}</span>
                 ) : (
                   <span className="text-[16px]">No phone number</span>
