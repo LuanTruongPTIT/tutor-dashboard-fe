@@ -12,10 +12,11 @@ interface UserProfile {
   name: string;
   id: string;
   email: string;
+  fullName: string;
 }
 
 interface UserContextType {
-  setProfile: (profile: UserProfile) => void;
+  setProfile: (profile: UserProfile | null) => void;
   getProfile: () => UserProfile | null;
   isAuthenticated: () => boolean;
   deleteProfile: () => void;
@@ -53,7 +54,7 @@ export function UserProvider({
     }
   }, []);
 
-  const setProfile = (profile: UserProfile) => {
+  const setProfile = (profile: UserProfile | null | any) => {
     localStorage.setItem("profile", JSON.stringify(profile));
     setProfileState(profile);
   };
